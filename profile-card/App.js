@@ -1,6 +1,13 @@
 // Profile Card — practical task (React Native basics)
 // Follow the steps in README.md and build your solution in this file.
-import { View, Text, Image, StyleSheet, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Platform,
+  useWindowDimensions,
+} from 'react-native';
 
 // Data to display. Do not change it.
 const BIO =
@@ -25,7 +32,33 @@ const COLORS = {
   online: '#22C55E',
 };
 
+// Reusable components
+
+function StatItem({ label, value }) {
+  // Para el estilo de los bordes
+  const isNotLast = label !== STATS[STATS.length - 1].label;
+
+  return (
+    <View style={[styles.stats, isNotLast && styles.statsDivider]}>
+      <Text style={styles.statsValue}>{value}</Text>
+      <Text style={styles.statsLabel}>{label}</Text>
+    </View>
+  );
+}
+
+function Tag({ label }) {
+  return (
+    <View style={styles.tag}>
+      <Text style={styles.tagText}>{label}</Text>
+    </View>
+  );
+}
+
 export default function App() {
+  // Dimensions
+  const { width } = useWindowDimensions();
+  const isWideScreen = width > 600;
+
   return (
     <View style={styles.screen}>
       {/* TODO STEP 1: build the card with View and Text (name, role, location, bio) */}
@@ -36,7 +69,7 @@ export default function App() {
 
       {/* <Text>TODO: build the profile card</Text> */}
 
-      <View style={styles.card}>
+      <View style={[styles.card, isWideScreen && styles.cardWidth]}>
         <Image
           style={styles.banner}
           resizeMode='cover'
@@ -61,25 +94,21 @@ export default function App() {
             {BIO}
           </Text>
           <View style={styles.statsRow}>
-            {STATS.map((item, index) => (
-              <View
+            {STATS.map((item) => (
+              <StatItem
                 key={item.label}
-                style={[
-                  styles.stats,
-                  index < STATS.length - 1 && styles.statsDivider,
-                ]}
-              >
-                <Text style={styles.statsValue}>{item.value}</Text>
-                <Text style={styles.statsLabel}>{item.label}</Text>
-              </View>
+                label={item.label}
+                value={item.value}
+              />
             ))}
           </View>
-          <View style={styles.tags}>
-            {SKILLS.map((skill) => (
-              <View key={skill} style={styles.tag}>
-                <Text style={styles.tagText}>{skill}</Text>
-              </View>
-            ))}
+          <View style={styles.skills}>
+            <Text style={styles.textSkills}>Skills</Text>
+            <View style={styles.tags}>
+              {SKILLS.map((skill) => (
+                <Tag key={skill} label={skill} />
+              ))}
+            </View>
           </View>
           <View style={styles.actions}>
             <View style={[styles.button, styles.buttonPrimary]}>
@@ -116,6 +145,11 @@ const styles = StyleSheet.create({
         elevation: 5,
       },
     }),
+  },
+  cardWidth: {
+    width: '100%',
+    maxWidth: 420,
+    alignSelf: 'center',
   },
   banner: {
     borderTopLeftRadius: 20,
@@ -196,6 +230,16 @@ const styles = StyleSheet.create({
   },
   statsLabel: {
     color: COLORS.muted,
+  },
+  skills: {
+    marginTop: 16,
+  },
+  textSkills: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
   },
   tags: {
     flexDirection: 'row',
